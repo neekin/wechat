@@ -2,6 +2,11 @@ var express = require('express');
 var router = express.Router();
 var crypto = require('crypto');
 
+
+router.get('/',function(req,res,next){
+    res.send("hello");
+})
+//微信验证流程
 const token = '41qH05vmjG37sD7Q42eUfhm33QGo09FN';
 /* WeChat verify */
 router.get('/verify',function(req,res,next){
