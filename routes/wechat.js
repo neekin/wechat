@@ -8,12 +8,24 @@ router.get('/', function (req, res, next) {
 })
 //微信验证流程
 const token = '41qH05vmjG37sD7Q42eUfhm33QGo09FN';
+ 
 /* WeChat verify */
-router.get('/verify', function (req, res, next) {
+const handleWechatRequest = function (req, res, next) {
   const {signature, timestamp, nonce, echostr} = req.query;
-  if (!signature || !timestamp || !nonce || !echostr) {
+  if (!signature || !timestamp || !nonce ) {
     return res.send('invalid request');
   }
+  if(req.method==='POST'){
+    console.log('handleWechatRequest.post',{body:req.body,query:req.query});
+  }
+  if(req.method ==='GET'){
+    console.log('handleWechatRequest.get',{get:req.body})
+    if(!echostr)
+    {
+       res.send('invalid request');
+    }
+  }
+  
   // 1）将token、timestamp、nonce三个参数进行字典序排序
   const params = [token, timestamp, nonce];
   params.sort();
@@ -23,11 +35,16 @@ router.get('/verify', function (req, res, next) {
   const sign = hash.update(params.join('')).digest('hex');
   // 3）开发者获得加密后的字符串可与signature对比，标识该请求来源于微信
   if (sign === signature) {
-    res.send(echostr);
+    if(req.method ==='GET')
+    {
+        res.send(echostr?echostr : 'invalid request');
+    }
   } else {
     res.send('invalid signature');
   }
-});
+};
 
 
+router.get('/api',handleWechatRequest);
+router.post('/api',handleWechatRequest)
 module.exports = router;
